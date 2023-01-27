@@ -210,8 +210,125 @@ CPU只能从内存中加载指令，因此执行程序必须位于内存。内�
 
 ## 3.1 进程概念
 
+程序本身不是进程。进程是执行的程序。程序只是被动passive实体。进程是活动active实体。
+进程本身也可作为一个环境，用于执行其他代码。
 
+进程可能处于以下状态
+- 新的new：进程正在创建
+- 运行running：指令正在执行
+- 等待waiting：进程等待发生某个事件
+- 就绪ready：进程等待分配处理器
+- 终止terminated：进程已经完成执行
+*一次只有一个进程可在一个处理器上运行；但是很多进程可处于就绪或等待状态。*
 
+![processState](images/processState.png "进程状态图")
 
+操作系统内的每个进程表示，采用**进程控制块PCB**Process Control Block，其包含许多与某个特定进程相关的信息
+- 进程状态process state
+- 程序计数器program counter：计数器表示进程将要执行的下个指令的地址
+- CPU寄存器CPU register
+- CPU调度信息CPU-scheduling information：优先级、调度队列的指针和其他参数
+- 内存管理信息memory-management information
+- 记账信息accounting information
+- I/O状态信息I/O status information
+PCB简单地作为这些信息的仓库
 
+现代操作系统支持一次能执行多个**线程**thread
 
+## 3.2 进程调度
+
+多道程序设计目标：无论何时都有进程运行，从而最大化CPU利用率
+分时系统目的：在进程之间快速切换CPU，以便用户在程序运行时能与其交互
+
+- 作业队列job queue：包括系统内所有进程
+- 就绪队列ready queue：驻留在内存中的、就绪的、等待运行的进程
+- 设备队列device queue：等待特定I/O设备的进程。每个设备都有自己的设备队列
+
+长期调度程序控制**多道程序程度**degree of multiprogramming（内存中的进程数量）
+
+- I/O密集型进程I/O-bound process：执行I/O
+- CPU密集型进程CPU-bound process：执行计算
+长期调度程序应选择合理进程组合
+
+中期调度程序medium-term scheduler核心思想是可将进程从内存或CPU竞争种移除，从而降低多道程序程度。称为交换swap。
+
+中断导致CPU从执行当前任务改变到执行内核程序。发生时系统需要保存当前运行在CPU上的进程的**上下文**。进程上下文用PCB表示。
+上下文切换context switch：切换CPU到另一个进程需要保存当前进程状态和恢复另一个进程的状态。上下文切换时间是存粹的开销。
+
+## 3.3 进程运行
+
+识别进程：唯一的**进程标识符pid**process identifier
+
+每个新进程可以再创建其他进程，形成进程树process tree。子进程可以从操作系统处直接获得资源，也可以从父进程获得资源子集。*限制子进程只能使用父进程的资源，可以防止创建过多进程，导致系统超载。*父进程可能向子进程传递初始化数据。
+
+进程创建新进程时执行可能
+- 父进程与子进程并发执行
+- 父进程等待
+新进程的地址空间可能
+- 子进程是父进程的复制品（程序与数据和父进程相同）
+- 子进程加载另一个新程序
+
+进程终止时可以返回状态值到父进程，进程资源由操作系统释放。被终止进位于进程表中的条目依然存在，称为僵尸进程zombie process。一旦父进程调用wait()则释放，若未调用子进程称为孤儿进程orphan process。
+
+## 3.4 进程间通信
+
+进程独立/协作
+
+进程协作：信息共享、计算加速、模块化、方便
+需要**进程间通信IPC** InterProcess Communication机制，允许进程交换数据与信息。基本模型由
+- 共享内存shared memory
+- 消息传递message passing
+
+![IPCModel](images/IPCModel.png "通信模型")
+
+*生产者-消费者问题*
+
+```
+/* 变量in指向缓冲区下一个空位；变量out指向缓冲区第一个满位 */
+/* in == out时缓冲区为空；((in + 1)%BUFFER_SIZE) == out时缓冲区为满 */
+/* 允许缓冲区的最大值为BUFFER_SIZE-1*/
+/* 未处理生产者和消费者同时访问共享内存的问题 */
+
+/* 生产者进程 */
+while (true) {
+    /* produce an item in next.produced */
+
+    while (((in + 1)%BUFFER_SIZE) == out)
+        ;/* do nothing */
+
+    buffer[in] = next.produced;
+    in = (in + 1) % BUFFER_SIZE;
+}
+
+/* 消费者进程 */
+item next.consumed;
+
+while (true) {
+    while (in == out)
+        ;/* do nothing */
+
+    next.consumed = buffer[out];
+    out = (out + 1) % BUFFER_SIZE;
+
+    /* consume the item in next.consumed */
+}
+```
+
+若进程P和Q需要通信，之间要有通信链路communication link
+
+- 直接通信：明确指定通信的接收者或发送者
+- 间接通信：通过邮箱或端口来发送和接收信息，两个进程只有拥有一个共享邮箱时才能通信
+无论通信是直接还是间接的，通信进程交换的信息总是驻留在临时队列中。
+
+## 3.5 IPC系统例子 略
+## 3.6 客户机/服务器通信
+
+**套接字**socket为通信的端点。通过网络通信的每队进程需要使用一对套接字，即每个进程各有一个。每个套接字由一个IP地址和一个端口号组成。
+
+低于1024的端口用于实现标准服务。IP地址127.0.0.1为特殊IP地址，称为**回送**loopback。
+
+---
+
+# 第4章 多线程编程
+
+## 4.1 概述
