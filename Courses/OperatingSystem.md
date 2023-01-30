@@ -506,4 +506,131 @@ SMP试图让一个进程运行在同一个处理器上，称为处理器亲和�
 
 ## 6.1 背景
 
+竞争条件race condition：多个进程并发访问和操作同一数据并且执行结果与特定访问顺序有关
+
+进程同步、进程协调
+
+临界区问题解决方案要求
+- 互斥：如果一个进程在临界区内执行，其他进程不允许在它们的临界区执行
+- 进步
+- 有限等待
+
+抢占式内核：设计更难；响应更快、更适用于实时编程
+
+互斥锁mutex lock
+- 一个进程在进入临界区时应得到锁，退出临界区时释放锁
+- 需要忙等待；在进程等待锁时没有上下文切换
+
+信号量semaphore
+原子操作wait()/P signal()/V
+
+``` C
+wait(S) {
+    while (S <= 0)
+        ;   //busy wait
+    S--;
+}
+
+signal(S) {
+    S++;
+}
+
+// 引入信号量
+
+typedef stuct{
+    int value;
+    struct process *list;
+} semaphore;
+
+wait(semaphore *S) {
+    S->value--;
+    if(S->value < 0) {
+        add this process to S->list;
+        block();    //挂起进程
+    }
+}
+
+signal(semaphore *S) {
+    S->value++;
+    if(S->value <= 0) {
+        remove a process P from S->list;
+        wakeup(P);  //重新启动阻塞进程P
+    }
+}
+```
+
+当一个进程修改信号量值时，没有其他进程能够同时修改同一信号量的值
+
+对于同一信号量，没有两个进程可以同时执行操作wait()和signal()
+
+死锁deadlock：两个或无限多个进程等待一个事件，而该事件只能由这些等待进程之一来产生
+无限阻塞/饥饿：进程无限等待信号量
+
+优先级反转问题：资源抢占
+优先级继承协议：所有正在访问资源的进程获得需要访问它的更高优先级进程的优先级，直到它们用完了有关资源为止，此时优先级恢复到原始值
+
+### 经典同步问题
+
+#### 读者-作者问题 reader-writer problem
+
+读者只读数据库，作者读写数据库
+*第一*读者-作者问题：读者不应保持等待，除非作者已获得权限使用共享对象。作者可能饥饿
+
+``` C
+//读者共享数据结构
+semaphore rw_mutex = 1; //读者作者进程共用
+semaphore mutex = 1;    //确保更新read_mutex时互斥
+int read_count = 0;
+
+//作者进程
+do {
+    wait(rw_mutex);
+        ...
+    /* writing is performed */
+        ...
+    signal(rw_mutex);
+} while (true);
+
+//读者进程
+do {
+    wait(mutex);
+    read_count++;
+    if (read_count == 1)
+        wait(rw_mutex)
+    signal(mutex);
+        ...
+    /* reading is performed */
+        ...
+    wait(mutex);
+    read_count--;
+    if(read_count == 0)
+        signal(rw_mutex);
+    signal(mutex);
+} while (true);
+```
+
+读写锁适用情况
+- 容易识别只读/只写共享数据
+- 读者进程多于作者进程
+
+*第二*读者-作者问题：一旦作者就绪，那么作者会尽可能快地执行。读者可能饥饿
+
+#### 哲学家就餐问题 dining-philosophers problem
+
+在多个进程之间分配多个资源，而且不会出现死锁和饥饿
+没有死锁的解决方案不一定能消除饥饿的可能性
+
+``` C
+//共享数据
+semaphore chopsticks[5] = {1};
+
+//哲学家i结构
+
+```
+
+抽象数据类型 Abstract Data Type，ADT 封装了数据及对其操作的一组函数
+
+管程monitor结构确保每次只有一个进程在管程内处于活动状态
+
+# 第7章 死锁
 
