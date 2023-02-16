@@ -554,3 +554,126 @@ public class PerfStatListener implements ServletRequestListener {
 ```
 
 ## JavaWeb技术栈总结（coding）
+
+# HTML&CSS
+
+## HTML、CSS和javascript三者的关系
+
+![HTML-CSS-JS](images/HTML-CSS-JS.png "HTML-CSS-JS三者的关系")
+
+## HTML
+
+### HTML的结构
+
+![HTMLStructure](images/HTMLStructure.png "HTML的结构")
+
+### 块和行的概念
+
+![BlockElement](images/BlockElement.png "块元素")
+
+![InlineElement](images/InlineElement.png "行内元素")
+
+## CSS
+
+### CSS的概念
+
+![UnderStandingCSS](images/UnderStandingCss.png "CSS的概念")
+
+![CSSBoxesExample](images/CSSBoxesExample.png "CSS盒子示例")
+
+### 基本语法（coding）
+
+#### 选择器
+
+- 标签选择器
+- 类选择器
+- ID选择器
+
+![CSSSelector-1](images/CSSSelector-1.png "CSS选择器其一")
+![CSSSelector-2](images/CSSSelector-2.png "CSS选择器其二")
+
+*SPECIFICITY:If one selector is more specific than the others, the more specific rule will take precedence over more general ones.*
+
+#### 属性
+
+- 字体 font
+    - PIXELS
+    - PERCENTAGE
+- 颜色 color
+    - RGB VALUES
+    - HEX CODES
+    - COLOR NAME
+- 边框 border,margin&padding
+![Border-Margin-Padding](images/Border-Margin-Padding.png "边框")
+
+### 布局方式（coding）
+
+#### 普通流
+
+position:static
+每个块级元素都换行显示，垂直向下排列
+
+![StaticPosition](images/StaticPosition.png "普通流")
+
+#### 相对定位
+
+position:relative
+在普通流的位置给出上下左右相对位移
+
+``` CSS
+p.example{
+    position:relative;
+    top:10px;
+    left:100px;
+}
+```
+
+![RelativePosition](images/RelativePosition.png "相对定位")
+
+#### 绝对定位
+
+position:absolute
+脱离普通流，直接用位置参数定位显示
+
+``` CSS
+h1{
+    position:absolute;
+    top:0px;
+    left:500px;
+    width:250px;
+}
+```
+
+![AbsolutePosition](images/AbsolutePosition.png "绝对定位")
+
+#### 固定定位
+
+position:fixed
+绝对定位的一种形式，将元素相对于浏览器定位
+
+``` CSS
+h1{
+    position:fixed;
+    ... //top padding ...
+}
+```
+
+![FixedPosition](images/FixPosition.png)
+
+#### 浮动元素
+
+浮动一个元素让其脱离普通流，根据参数浮动
+
+``` CSS
+blockquote{
+    float:right;
+    width:275px;
+    ...
+}
+```
+
+![FloatPosition](images/FixPosition.png "浮动元素")
+
+#### z-index
+
+*任何元素从普通流脱离时，盒子将会产生重叠，用z-index属性控制层级*
