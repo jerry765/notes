@@ -677,3 +677,142 @@ blockquote{
 #### z-index
 
 *任何元素从普通流脱离时，盒子将会产生重叠，用z-index属性控制层级*
+
+# JavaScript
+
+## 概念
+
+### 用途
+
+JavaScript是目前广泛用于**客户端**开发的一种**脚本语言**，在“大前端”的背景下，也可用于服务端开发。
+
+### 特点
+
+- JavaScript语言最初由Netscape公司的Brendan Eich设计，是一种**动态、弱类型、基于原型的语言，内置支持类**
+- 对于JavaScript，你常常需要学习各种解决问题的模式
+
+### 使用方式（coding）
+
+网页内部使用：
+``` js
+<script>
+    //js代码
+</script>
+```
+
+网页外部：
+``` js
+<script src = "***.js">
+</script>
+```
+
+## 语法
+
+### 基本语法（coding）
+
+#### 变量与数据类型
+
+- 弱类型变量和更简洁灵活的基本类型
+    - JavaScript是弱类型的语言，基本类型变量通过var声明`var 变量名;`。
+- 变量名命名规范和Java的区别是多一个$字符。
+- 动态赋值与变量提升
+    - JavaScript 是一种动态类型语言，也就是说，变量的类型没有限制，变量可以随时更改类型。
+    - JavaScript 引擎的工作方式是：先解析代码，获取所有被声明的变量，然后再一行一行地运行。导致所有的变量的声明语句，都会被提升到代码的头部，这就叫做变量提升（hoisting）。
+
+- JavaScript共有六种数据类型(ES5)：
+    - 数值（number）：整数和小数（比如1和3.14）
+    - 字符串（string）：文本（比如Hello World）
+    - 布尔值（boolean）：表示真伪的两个特殊值，即true（真）和false（假）
+    - undefined：表示“未定义”或不存在，即由于目前没有定义，所以此处暂时没有任何值
+    - null：表示空值，即此处的值为空
+    - 对象（object）：各种值组成的集合
+- 说明：
+    - 数值、字符串、布尔值，被称为原始类型或基本类型，对象被称为合成类型
+    - 对象又可以分为狭义的对象(object)、数组(array)、函数(function)
+    - 除非特别声明，一般讲的对象就是指狭义的对象object
+
+关于null和undefined
+- 在变量使用层面，可认为二者在使用和结果上没有区别，都表示“没有”。
+- 更细节的区分是：null表示空值，即该处的值现在为空。如调用某个函数时，需要一个参数，可是不知道传入什么，这时就可以传入null，表示“我知道需要一个参数，但没值可传”。
+- 反之，如果知道需要一个参数，却什么也不传，这时候调用函数的结果就是undefined，即“未定义”。
+
+关于NaN
+- NaN是 JavaScript 的特殊值，表示“非数字”（Not a Number），主要出现在数值运算发生错误或将字符串解析成数字出错的场合。
+- NaN不是独立的数据类型，而是一个特殊数值，其数据类型依然属于数值。
+- NaN不等于任何值，包括自身，与任何数值进行运算的结果都是NaN。
+- NaN在布尔运算时被当作false。
+
+#### 数组
+
+- JavaScript语言中的数组表面上和Java中的数据类似，有两种创建的方式（字面和new关键字），推荐使用字面方式创建数组。
+- 同时数组也是对象，也支持对象的相关操作，比如length()和item(index)等方法。
+- 但本质上，要理解JavaScript数组，需要结合堆数组、栈数组和数组空间动态分配(malloc)的概念。
+
+#### 函数
+
+- 声明函数通过function关键字
+- 函数没有返回值类型的声明
+- 如果有形参，形参没有类型的声明
+
+##### 标准函数
+
+``` js
+function area() {
+    return width*height;
+};
+
+var size = area(3, 4);
+```
+
+##### 匿名函数
+
+``` js
+var area = function(width,height) {
+    return width * height;
+};
+
+var size = area(3, 4);
+```
+
+##### 立即执行匿名函数
+
+``` js
+var area = (function(){
+    var w = 3;
+    var h = 2;
+    return w * h;
+}());
+```
+
+#### 对象
+
+- 对象（object）是 JavaScript 语言的核心概念，也是最重要的数据类型。
+- 对象是一组“键值对”（key-value）的集合，是一种无序的复合数据集合。
+- 键名：对象的所有键名都是字符串，加不加引号都可以。
+- 读取对象的属性有两种方法：一种是使用点运算符，还有一种是使用方括号[]运算符。
+- 对象也符合JavaScript的动态语言特性，属性可以被删除，判断对象是否有某个属性，可以使用in运算符。
+
+对象基本语法
+``` js
+var hotel = {
+    name:'Quay';
+    rooms:40;
+    booked:25;
+    gym:true;
+    roomTypes:['twin',"double","suite"];
+    checkAvailability:function(){
+        return this.rooms - this.booked;
+    }
+}
+```
+
+### 内置对象
+
+![JSBuiltInObject](images/JSBuiltInObject.png "JS内置对象")
+
+#### BOM
+
+#### DOM
+
+#### 全局对象
+
