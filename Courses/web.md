@@ -816,3 +816,145 @@ var hotel = {
 
 #### 全局对象
 
+# CH08 AJAX
+
+## BOM和DOM模型
+
+### BOM中常用对象
+
+BOM：Browser Object Model，浏览器对象模型
+
+window当前浏览器窗口
+- document网页文档
+- history浏览历史记录
+- location地址栏URL
+- navigator浏览器信息
+- screen设备屏幕信息
+
+### DOM树的概念
+
+DOM：Document Object Model，文档对象模型。
+
+文档对象模型DOM规定了浏览器应该如何创建HTML元素，以及JavaScript如何操作HTML元素。
+
+- 当浏览器加载Web页面时，在内存中创建页面模型——DOM树对象模型
+- JavaScript操作HTML页面内容时，是通过一系列API实现的——DOM API
+
+DOM树中每个节点都是对象，拥有方法和属性，可以分为**文档节点、元素节点、属性节点和文本节点**四大类型。
+
+### 使用JS访问DOM（coding)
+
+#### 访问和更新元素
+
+DOM常用API——访问元素
+- 返回单一元素节点
+    - getElementById('id')
+    - querySelector('css selector')
+- 返回一个或多个元素节点（NodeList）
+    - getElementByClassName('class')
+    - getElementByTagName('tag’)
+    - querySelectorAll('css selector')
+
+DOM常用API——遍历元素
+- 定位到某个元素后，可以使用如下API遍历整个DOM树：
+    - parentNode
+    - previousSibling
+    - nextSibling
+    - firstChild
+    - lastChild
+
+#### 访问和更新元素内容
+
+- DOM常用API——获取或更新元素内容
+    - 文本节点：nodeValue属性
+    - 元素节点
+        - textContent属性
+        - innerText属性
+        - createElement()、createTextNode()、appendChild()和removeChild()方法
+        - innerHTML属性
+
+### 事件处理（coding）
+
+DOM模型针对浏览器和网页内容规定了一系列的用户动作行为，称为网页事件。
+
+网页事件从类型上可以分为：
+- 浏览器事件
+- 键盘事件
+- 鼠标事件
+- 焦点事件
+- 表单事件
+- DOM事件
+
+#### 事件处理的基本概念
+
+JavaScript事件处理分为三个步骤：选定元素、事件绑定、事件处理。
+
+#### 事件绑定的三种方式
+
+事件绑定有三种方法：**HTML绑定、传统DOM绑定和DOM监听器**。
+
+HTML方法
+``` HTML
+<input type="text" id="username" onblur="checkUsername()" />
+```
+
+传统DOM方法
+``` JS
+var elUsername = document.getElementById('username');
+elUsername.onblur = checkUsername;
+```
+DOM监听器方法
+``` JS
+var elUsername = document.getElementById('username');
+elUsername.addEventListener('blur',checkUsername,false);
+
+var elUsername = document.getElementById('username');
+elUsername.addEventListener('blur',function(){
+    checkUsername(5);
+},false);
+```
+
+## AJAX
+
+### 基本概念
+
+#### Why?
+
+- 更丰富的用户体验和全新的交互方式
+- 局部刷新页面，而不是整个页面
+- 连续不间断的网站使用体验
+- 提供类似C/S应用的交互效果
+
+#### What?
+
+AJAX：Asynchronous JavaScript And XML
+- Asynchronous：异步，客户端和服务端的通信方式
+- JavaScript：一种客户端脚本语言(HTML、CSS、DOM)
+- XML：数据的表示方式(JSON)
+
+#### 同步和异步的通信机制
+
+同步通信方式：即典型的请求响应模型。在传统的Web应用模型下，大部分的用户操作都会发送一个HTTP请求给服务器，然后服务器开始处理(接收数据，执行业务逻辑，访问数据库等)，最后向浏览器返回HTML页面
+
+异步通信方式：异步发送请求，消除了传统的“发送请求－等待－发送请求－等待”的特性，极大的提高了用户体验，实现这种通信方式的核心技术是浏览器的**XMLHttpRequest**对象
+
+### XMLHttpRequest对象（coding）
+
+常用方法
+- `open("method","url")`：建立对服务器的调用，method参数表示请求方法，url表示请求的资源
+- `send(content)`：向服务器发送请求
+
+常用事件和属性
+- onreadystatechange：请求的状态发生改变
+- readyState：表示请求状态的属性。0-未初始化，1-正在加载，2-已加载，3-交互中，4-完成
+- responseText：服务器的响应，表示为一个字符串
+- responseXML：服务器的响应，用XML封装，可被解析为DOM
+- status：服务器状态码
+
+### AJAX应用的流程（coding）
+
+客户端
+![AjaxClient](images/AjaxClient.png "Ajax客户端")
+
+服务端
+![AjaxServer](images/AjaxServer.png "Ajax服务端")
