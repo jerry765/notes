@@ -381,3 +381,65 @@ public class UserDao {
     public ArrayList<User> selectAllUser() throws Exception {...}
 }
 ```
+
+# CH04 开发模式和MVC
+
+## 开发模式的概念
+
+### Why?
+
+### Model Ⅰ: JSP+JavaBean
+
+Model I是指基于JSP+JavaBean的开发模式，JSP负责Web相关的部分，包括数据的展示，请求逻辑的控制等；JavaBean负责业务逻辑的部分，包括数据的存取，业务的实现。
+
+![JSPAndJavaBean](images/JSPAndJavaBean.png "JSP+JavaBean")
+
+一般意义上的JavaBean是指一种用于封装数据和业务逻辑的实体类，为可复用组件
+
+Model I只适用于中小型Web应用的开发，由于：
+- 虽然使用JavaBean从Web应用中解耦了业务逻辑，但是用户的请求访问**逻辑、数据内容与表示**仍然没有分离。
+- JSP的固有特征使其更适合作为数据展示和表达的技术规范。
+
+### Model Ⅱ: JSP+Servlet+JavaBean
+
+Java Web中的MVC具体表现为：模型由JavaBeans组成，视图由JSP页面组成，控制器由Servlets实现。
+
+![MVCInJavaWeb](images/MVCInJavaWeb.png "Java Web中的MVC")
+
+在Java Web应用的开发中，一般将Model还进一步细分为：完成业务逻辑的**业务Bean**、实现数据持久化操作的**DAO**和仅用于表达数据的**值对象POJO**。
+
+## MVC（Coding）
+
+### 基本原理
+
+MVC模式认为程序不论简单或复杂，从结构上看都可以分为三层：
+- 视图层View：用户界面
+- 数据层Model：程序中的数据或信息
+- 控制层Controller：负责视图层和数据层的交互
+
+![MVCModel](images/MVCModel.png "MVC模式")
+
+MVC模式的最佳实践
+- MVC模式中的三层是紧密联系在一起的，但更重要的是**相互独立性**，每一层内部的变化不影响其他层。
+- 层与层之间通过接口(Interface)进行交互，应尽量做到**面向接口编程**。
+
+### JavaWeb中MVC的实现
+
+### 项目结构和代码组织
+
+##  JSTL和EL（Coding）
+
+- JSTL
+    - 基本概念：标准标签库：JSTL，JSP Standard Tag Library
+    - 语法和用法
+        - 基本语法：`<%@ taglib url="http://java.sun.com/jsp/jstl/core" prefix="c" %>`（国际化 core改fmt c改fmt）
+        - 用法
+            - `<c:if>`：条件判断
+            - `<c:choose>`(when otherwise)：条件嵌套，switch
+            - `<c:foreach>`：循环
+            `<fmt:formatDate>`：格式化显示
+- EL
+    - 基本概念：EL(Expression Language)表达式语言是JSP的重要特性之一
+    - 语法和用法
+    -   - 基本语法：`${Expression}`
+        - []和.运算符：用于对象属性或数组、集合
