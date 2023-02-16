@@ -958,3 +958,128 @@ AJAX：Asynchronous JavaScript And XML
 
 服务端
 ![AjaxServer](images/AjaxServer.png "Ajax服务端")
+
+# CH09 jQuery
+
+## Ajax使用进阶
+
+### Ajax应用中的三种数据表示方式（coding）
+
+在Ajax应用中服务器和客户端之间传输数据有三种表示方式：**简单字符串、XML、JSON**。
+- 简单字符串方式一般用于传递“Yes/No”此类数据本身无结构的数据。
+- XML方式常用于复杂数据的表示，一般来说，数据本身有结构化要求，数据量也比较大。
+- JSON方式常用于中小型数据的表示，也是目前应用最广泛的数据表示方式。
+``` XML
+<?xml version="1.0" />
+<list>
+    <product>
+        <name>Koi</name>
+        <description>images/fish3.gif</description>
+    </product>
+    ...
+</list>
+```
+``` JSON
+{
+    {
+        "description":"images/fish3.gif",
+        "name":"Koi"
+    }
+}
+```
+
+- JSON字符串：其本质是一个有格式要求的**普通字符串**
+- JSON对象：JS中的一个**内置对象**
+
+### 跨域访问
+
+跨域问题的来源
+- 跨域问题的根源是浏览器的**同源策略**。
+- 同源策略：浏览器的安全策略之一，指一个网页的内容只能来自于同一个服务器来源。
+- 同源：规范认为两个URL如果**协议、主机名、端口**均一致则同源，三者当中有一个不相同则认为不同源。
+
+### Ajax经典应用场景
+
+- 表单验证
+- 动态加载列表框
+- 创建自动刷新页面
+- 显示进度条
+- 创建工具提示
+- 自动补全功能
+- 访问Web服务
+
+## 概念
+
+### Why?
+
+使用AJAX技术的Web应用需要在HTML页面中编写**大量的JavaScript代码**。并且此类代码的复杂性主要体现在**对DOM的操作**。
+
+- jQuery is a fast, small, and feature-rich **JavaScript library**.
+- It makes things like *HTML document traversal and manipulation, event handling, animation, and Ajax* much simpler with an easy-to-use API that works across a multitude of browsers.
+
+### 使用方式（coding）
+
+在开发中使用jQuery框架很简单，只需将相应版本的对应的.js文件(jquery-3.4.1.js)引入到项目中即可(线上部署项目还可以使用CDN方式引用jQuery)。
+
+## 语法（coding）
+
+### 基础语法 $(selector).action()
+
+- $：用于在JS中标识jQuery
+- selector：选择器，用于查找或查询HTML元素
+- action()：指对选择的元素执行的特定操作
+
+### 文档就绪函数
+
+为了防止HTML文档在完全加载之前运行jQuery代码，一般会将所有的jQuery调用放到文档就绪函数中。
+
+``` JS
+$(document).ready(function() {
+    // Your script goes here
+});
+```
+
+### 常用动作
+
+- 获取元素内容
+    - `.html()`：获取元素的所有内容，包括元素
+    - `.text()`：获取元素中所包含的文本内容
+- 修改元素内容
+    - `.html('content')`
+    - `.text('content')`
+    - `.replace('content')`
+    - `.remove('content')`
+- 插入元素（见下图）
+    - `.before()`
+    - `.after()`
+    - `.prepend()`
+    - `.append()`
+- 迭代元素（见下代码）
+
+![jQueryAddElement](images/jQueryAddElement.png "jQuery插入元素")
+
+``` js
+$(function() {
+    $('li').each(function() {
+        var ids = this.id;
+        $(this).append('<span class="order">' + ids + '</span>');
+    });
+});
+```
+### 事件处理
+
+`.on()`
+``` js
+// 事件处理
+$('li').on('click',function() {
+    $(this).addClass('complete');
+});
+
+// 带对象的事件处理
+$('li').on('click',function(e) {
+    eventType = e.type;
+});
+
+// on的完整用法
+.on(events[,selector][,data],function(e));
+```
