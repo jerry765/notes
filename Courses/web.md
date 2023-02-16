@@ -443,3 +443,114 @@ MVC模式的最佳实践
     - 语法和用法
     -   - 基本语法：`${Expression}`
         - []和.运算符：用于对象属性或数组、集合
+
+# CH05 Servlet和JSP进阶
+
+## 过滤器
+
+Servlet API还提供一系列的用于**拦截**Request请求和Response响应的API接口，在Java Web应用的开发中通过调用这些API在**用户访问资源前或服务器完成响应后**进行某些特定的处理。
+
+![filter](images/filter.png "过滤器")
+
+### 使用场景
+
+- 对用户请求进行统一认证
+- 对用户访问进行审核和统计
+- 对用户发送的数据进行过滤或替换
+- 转换字符编码、图像格式等
+- 对响应内容进行压缩，减少网络传输量
+- 对请求或响应数据进行加/解密处理
+
+### 语法和用法（coding）
+
+实现过滤器的方法总体上和Servlet类似
+1. 实现相关监听器接口，并完成具体的监听方法；
+2. 在容器内通过配置文件或注解配置监听器；
+
+``` java
+public class xxxFilter implements Filter {
+    init();
+    doFilter();
+    destroy();
+}
+```
+
+由于一个应用中可能存在多个过滤器，而多个过滤器的先后顺序必须通过web.xml中的配置顺序进行确定。
+
+过滤器的功能主要是通过doFilter()方法来实现的，方法原型为：
+``` java
+void doFilter(ServletRequest request,ServletResponse response,FilterChain filterChain)
+```
+请求对象request、响应对象response、过滤器链对象filterChain
+
+``` java
+public class CodeFilter implements Filter {
+    public void destroy() {}
+    public void init(FilterConfig arg0) throws ServletException {}
+    public void doFilter(ServletRequest request,ServletResponse response,FilterChain chain) throws IOException,ServletException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        req.setCharacterEncoding("UTF-8");  //IMPORTANT!
+        chain.doFilter(request,response);
+    }
+}
+```
+``` XML
+<filter>
+    <filter-name>CodeFilter</filter-name>
+    <filter-class>servlet.CodeFilter</filter-class>
+</filter>
+
+<filter-mapping>
+    <filter-name>CodeFilter</filter-name>
+    <url-pattern>/*</url-pattern>   //IMPORTANT!
+    <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
+```
+
+## 监听器
+
+Servlet API提供一系列的事件和事件监听接口，在Java Web应用的开发中通过调用这些API可以进行**事件驱动**的开发
+
+![listener](images/listener.png "监视器")
+
+### 使用场景
+
+### 语法和用法（coding）
+
+编写监听器的方法和编写Servlet类似：
+1. 实现相关监听器接口，并完成具体的监听方法
+2. 在容器内通过配置文件或使用注解配置监听器
+
+``` java
+@WebListener
+public class xxxListener implements xxxListener {
+    //对应事件开发
+}
+```
+``` XML
+<listener>
+    <listener-class> fully-qualified class </listener-class>
+</listener>
+```
+
+监听器使用范例：记录一个请求在服务器消耗的时间
+``` java
+public class PerfStatListener implements ServletRequestListener {
+
+    public void requestInitialized(ServletRequestEvent sre) {
+        ServletRequest servletRequest = sre.getServletRequest();
+        ServletRequest.setAttribute("start",System.nanoTime()); //IMPORTANT!
+    }
+
+    public void requestDestroyed(ServletRequestEvent sre) {
+        ServletRequest servletRequest = sre.getServletRequest();
+        Long start = (Long) servletRequest.getAttribute("start");
+        Long end = System.nanoTime();
+        HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+        String uri = httpServletRequest.getRequestURI();
+        System.out.println("time taken to execute" + uri + ":" + ((end-start)/1000) + "ms");
+    }
+}
+```
+
+## JavaWeb技术栈总结（coding）
