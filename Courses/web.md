@@ -90,15 +90,41 @@ HTTP：HyperText Transfer Protocol 超文本传输协议
 ### XML
 
 - 概念
+    - XML：eXtensible Markup Language，可拓展标记语言
 - 语法和格式要求
+    - 语法规定一个XML文档由两部分组成：**声明**和**文档元素**
+    - 格式良好不一定有效
+    - 有效的XML文档常用规范
+        - DTD：文档类型定义
+        - XSD：XML模式定义
 
 ## Servlet（coding）
 
 ### javax.servlet Servlet接口
 
+javax.servlet： 定义Servlet和Servlet容器之间契约的类和接口
+javax.servlet.http: 定义基于HTTP协议的Servlet的类和接口
+
+生命周期方法
 - init()
 - service()
 - destroy()
+Servlet的生命周期包括**加载、实例化、处理客户端请求和销毁**。
+当有请求到达时，Tomcat容器负责加载Servlet，然后调用init()方法进行初始化操作，紧接着开启一个service()方法线程进行处理请求，当所有的service()线程均执行完成后，Tomcat容器垃圾回收机制调用destroy()方式销毁Servlet。
+
+``` Java
+public interface Servlet {
+    void init(Servlet Config var1) throws ServletException;
+
+    ServletConfig getServletConfig();
+
+    void service(ServletRequest var1,ServletResponse var2) throws ServletException,IOException;
+
+    String getServletInfo();
+
+    void destroy();
+}
+```
 
 ### javax.servlet.http
 
@@ -106,5 +132,23 @@ HTTP：HyperText Transfer Protocol 超文本传输协议
     - doPost()
     - doGet()
 - HttpServletRequest
+    - `String getParameter(String name)`：返回请求指定参数的值
+    - `HttpSession getSession()`：返回与请求相关的Session对象
 - HttpServletResponse
+    - `void sendRedirect(String url)`：重定向到新的URL
 - HttpSession
+
+``` Java
+public class FirstServlet extends HttpServlet{
+
+    protected void doPost(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
+        response.setContentType("text/html");
+        PrintWriter writer=response.getWriter();
+        writer.print("...");    //Some HTML in ...
+    }
+
+    protected void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
+        doGet(request,response);
+    }
+}
+```
