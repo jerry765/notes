@@ -152,3 +152,232 @@ public class FirstServlet extends HttpServlet{
     }
 }
 ```
+
+# CH03 Web开发应用基础和JSP
+
+## Web应用开发核心概念
+
+### 组件关联关系
+
+- 请求转发：**forward，是指将客户端的请求转发给同一个应用程序中的其他Web组件**
+    - 请求转发表明该次请求并没有完成，只是转交给其他组件去完成，客户端并不清楚转发的过程，客户端地址栏不发生改变。
+    - 在Servlet API中通过RequestDispatcher接口的forward()来实现HTTP请求的转发，同时将请求和响应对象传递给目标组件。
+    - 具体的操作方式有：request.getRequestDispatcher(“目标”).forward()等。
+- 请求重定向：**redirect，是指将客户端的请求重定向到其他任意的URL上**
+    - 请求重定向后即表明该次请求响应流程已完成，返回一个响应给客户端(地址栏发生改变)，客户端根据响应发起一次新的请求，不能使用之前的request对象。
+    - 在Servlet API中通过ServletResponse的sendRedirect()来实现重定向。
+    - 具体的操作方式有：response.sendRedirect(“目标”)。
+
+### 会话跟踪
+
+什么是会话跟踪？
+- HTTP协议本质上是一个无状态协议，基于请求-响应的通信模式，所以服务端和客户端之间无法保持连接，保持会话状态。
+- 会话跟踪就是一系列维持Web应用中客户端和服务端会话状态的编程技术。
+
+Web应用开发中常用的会话跟踪方法有：
+- URL重写
+    - URL重写实现会话跟踪
+        - URL重写的实现方式是将一个或多个token作为参数，添加到URL字符串中，每个token以key=value的方式表现。
+        - URL重写适用于无需在太多页面之间保持会话的场景。
+    - URL重写的会话跟踪有如下限制：
+        - URL字符串的总长度取决于浏览器限制
+        - URL重写需在服务端完成，token过于复杂难以操作
+        - 某些字符(空格，问号等)必须用base64编码
+        - 所有信息在地址栏均可见，安全性低
+- 隐藏域
+    - 使用隐藏域的实现方式和重写URL方法类似，区别是将附加在URL中的token信息放置到form表单的隐藏域中。
+    - 相对于URL重写方式：
+        - 没有字符数限制
+        - 无须进行特殊编码
+- 客户端保存信息：Cookies
+    - Cookie是一个对象，其内容主要包含以key-value形式保存的token信息
+    - Cookie作为HTTP请求头的一部分，其传输由HTTP协议控制。
+    - Cookie可以由服务端构建，也可以由浏览器端的JavaScript语言构建，最终都保存在浏览器中。
+    - Cookie对象除了包含token信息外，还有maxAge、path等属性。
+    - 用Cookies方式来进行会话跟踪的主要缺点是用户可在浏览器进行限制。
+- **服务端保存信息：HttpSession**
+    - HttpSession是所有的会话跟踪技术中最安全和最常用的技术。
+    - 其**基本原理**是：用户第一次请求服务器时，由服务器创建HttpSession对象，并生成唯一的用户ID(JSESSIONID)，其他会话token信息以key-value的方式保存在HttpSession对象中，将用户ID以Cookie或URL的方式告知客户端浏览器，整个过程由Web容器进行管理和控制。
+    - 服务端程序通过HttpServletRequest对象的getSession()方法获取HttpSession对象，HttpSession提供一系列方法实现上述功能。
+
+### 数据的作用域
+
+Web应用中，多个Web组件通过彼此关联来实现协作，共同完成客户端的请求，这个过程中就会涉及到数据的作用域问题。
+
+按作用域的由小到大，作用域分为：
+- **页面范围(page)**：一个Servlet类或一个JSP页面；
+- **请求范围(request)**：一个请求过程的范围，请求被响应之间；
+- **会话范围(session)**：会话范围，整个会话持续过程；
+- **应用范围(application)**：服务器运行过程中(ServletContext)。
+
+Web应用是**通过将值或对象放入对应的作用域对象中**，来实现数据作用域控制的，作用域对象均提供setAttribute()和getAttribute()方法。
+
+## JSP
+
+### JSP和Servlet的关系
+
+JSP的由来：用Servlet编写Web应用，导致服务端代码过于繁琐和复杂，将Servlet中的静态部分和动态部分分开编写，同时提供类似HTML的写法，这就是Java动态网页技术，**Java Server Page**。
+
+``` JSP
+<html>
+<head>
+    <title>Hello示例</title>
+</head>
+<body>
+<%
+    out.println("Hello:"+name);
+%>
+</body>
+</html>
+```
+
+- JSP是一种建立在**Servlet规范**提供的功能之上的动态网页技术。
+- **JSP文件**在用户第一次请求时，会**被转译成Servlet**，然后由这个Servlet处理用户的请求，JSP可以看成是运行时的Servlet。
+- 本质上说，JSP就是一种为了方便程序员编写的Servlet表现形式。
+
+### JSP语法（coding）
+
+- 指令:`<%@ DirectiveAttribute="value" %>`
+- 表达式:`<%=表达式 %>`
+- 标准动作:`<jsp:动作名 >`
+- 注释:`<%-- --%>`
+- 隐式对象
+    - 隐式对象是指在JSP脚本元素中，不需要任何的声明和定义就可以直接使用的对象
+
+
+## JDBC（coding）
+
+JDBC是Java数据库连接(Java Database Connectivity)的简称。
+JDBC API采用接口和实现分离的设计思想，其中接口主要包含在**java.sql**包中，之后的扩展内容在javax.sql包中。
+
+### JDBC实现数据库的CRUD(创建读取更新删除)
+
+常用JDBC API使用详解
+- 加载驱动:`class.forName("com.mysql.jdbc.Driver")`
+- 获得连接:`Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/demo","root","123")`
+- 执行SQL
+    - `Statement statement = connection.creatStatement();`
+    - `Result resultSet = statement.excuteQuery(sql);`
+    - `int result = statement.excuteUpdate(sql);`
+- 访问结果
+    - `String username = resultSet.getString("username");`
+    - `String password = resultSet.getString(2);`
+
+``` java
+public class JDBCDemo {
+    public static void main(String[] args) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver"); //IMPORTANT!
+
+            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/demo","root","");  //IMPORTANT!
+
+            Statement statement = connection.createStatement();
+
+            String sql = "INSERT INTO userinfo VALUES (1,'Bill Gates','bill@microsoft.com',SS)";    //IMPORTANT!
+
+            int result = statement.executeUpdate(sql);
+
+            if(result == 1){    //IMPORTANT!
+                System.out.println("Insert new user success");
+            }
+
+            statement.close();
+            connection.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}
+
+public class JDBCDemo2 {
+    public static void main(String[] args){
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+
+            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/demo","root","");
+
+            Statement statement = connection.createStatement();
+
+            String sql = "SELECT * FROM userinfo";
+
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while(resultSet.next()){
+                System.out.print(resultSet.getInt(1)+"\t");
+                ...
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (Exception) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### JDBC代码的优化
+
+``` java
+public class DBUtil {
+    private static String Driver = "com.mysql.jdbc.Driver";
+    private static String url = "jdbc:mysql://127.0.0.1:3306/demo";
+    private static String username = "root";
+    private static String password = "";
+
+    public static Connection.getConnection() throws Exception {
+        try {
+            Class.forName(driver);
+            return DriverManager.getConnection(url,username,password);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public static void closeConnection(Connection connection) throws Exception {
+        if (connection != null) {
+            connection.close();
+        }
+    }
+
+private static void closeStatement(Statement statement) throws Exception ... ;
+private static void closePreparedStatement(PreparedStatement pStatement) throws Exception ... ;
+private static void closeResultSet(ResultSet resultSet) throws Exception ...;
+}
+
+public class User {
+    private int id;
+    private String name;
+    private String email;
+    private int age;
+
+    public User(){
+
+    }
+
+    ... //get and set
+}
+
+public class UserDao {
+    private static String insertUserSQL = "INSERT INTO userinfo VALUES (?,?,?,?)";
+
+    private static String updateUserSQL = "UPDATE userinfo SET username=?,email=?,age=? WHERE id=?";
+
+    private static String deleteUserSQL = "DELETE FROM userinfo WHERE id=?";
+
+    private static String selectUserSQL = "SELECT * FROM userinfo WHERE id=?";
+
+    private static String selectAllUserSQL = "SELECT * FROM userinfo";
+
+    public boolean insertUser(User user) throws Exception {...}
+
+    public boolean updateUser(User user) throws Exception {...}
+
+    public boolean deleteUser(User user) throws Exception {...}
+
+    public User selectUser(int id) throws Exception {...}
+
+    public ArrayList<User> selectAllUser() throws Exception {...}
+}
+```
