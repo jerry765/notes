@@ -1083,3 +1083,130 @@ $('li').on('click',function(e) {
 // on的完整用法
 .on(events[,selector][,data],function(e));
 ```
+
+# JavaScript进阶
+
+## jQuery与AJAX
+
+### 使用jQuery简化AJAX操作常用API（coding）
+
+jQuery提供一系列API简化AJAX操作，下表为**请求相关API：
+- **`$.ajax()`**：最核心的方法，其他方法均为`$.ajax()`的简化
+
+`$.ajax()`的详细使用：
+- type：HTTP请求方法，包括GET、POST等
+- url：请求的服务端URL
+- data：发送给服务器或者从服务器获取的数据
+- success：请求成功时的回调函数
+- error：请求错误时的回调函数
+
+![Function-ajax()-Example](images/Function-ajax-Example.png 'ajax()使用')
+
+## 深拷贝与浅拷贝（coding）
+
+浅拷贝
+``` js
+var name = "鸣人"
+
+var person = {
+    name: "宁次",
+    age: 20,
+}
+
+var name2 = name
+var person2 = person
+```
+![ShallowCopy](images/ShallowCopy.png "浅拷贝")
+
+深拷贝
+``` js
+var person = {
+    name: "宁次",
+    age: 20,
+}
+
+var person2 = {}
+person2.name = person.name
+person2.age = person.age
+```
+![DeepCopy](images/DeepCopy.png "深拷贝")
+
+深拷贝的问题
+``` js
+var person = {
+    name: "宁次",
+    age: 20,
+    sister: {
+        name: "雏田",
+        age: 18,
+    },
+}
+
+var person2 = {}
+person2.name = person.name
+person2.age = person.age
+person2.sister = person.sister;
+
+person2.name = "鸣人"
+
+alert(person.name)  //宁次
+
+person2.sister.name="鸣妹"
+alert(person.sister.name)   //鸣妹，第二层为浅拷贝
+```
+
+数组使用经典范例
+``` js
+var arr = [1,2,3,4,5];
+
+arr.forEach( function(value, key, arr1) {
+    value++;
+});
+
+console.log(arr);   //1,2,3,4,5
+```
+``` js
+var arr = [1,2,3,4,5];
+
+arr.forEach( function(value, key, arr1) {
+    value++;
+    arr1[key] = value + 10;
+});
+
+console.log(arr);   //11,12,13,14,15
+```
+
+## this关键字（coding）
+
+- this是JavaScript中的一个非常重要的语法点和精华所在。
+- 简单来说，*this是一个指向对象的引用(指针)，指向属性或方法“当前”所在的对象。*
+
+``` js
+var a = {
+    p: 'Hello',
+    b: {
+        m: function () {
+            console.log(this.p);
+        }
+    }
+};
+
+a.b.m() // undefined
+```
+
+**函数嵌套中避免多层this**：使用一个变量固定this的值，然后内层函数调用这个变量。
+
+``` js
+var o = {
+    f1: function () {
+        var _this = this;
+        console.log(this);
+        var f2 = function () {
+            console.log(_this);
+        }();
+    }
+}
+
+o.f1(); // Object    //Object
+//if miss   // Object   //Window
+```
